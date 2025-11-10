@@ -64,7 +64,17 @@ npm start
 
 ### 构建生产版本
 ```bash
+# 标准构建（支持相对路径）
 npm run build
+
+# 增强构建（自动修复路径）
+npm run build:relative
+```
+
+### 测试构建版本
+```bash
+# 启动本地测试服务器
+npm run serve
 ```
 
 ## 📁 项目结构
@@ -76,7 +86,6 @@ snake_game/
 ├── src/
 │   ├── components/         # React组件
 │   │   ├── GameCanvas.js   # 游戏画布组件
-│   │   ├── GameHUD.js      # 游戏界面组件
 │   │   └── GameHUD.css     # 界面样式
 │   ├── game/               # 游戏逻辑
 │   │   └── gameLogic.js    # 核心游戏逻辑
@@ -85,9 +94,24 @@ snake_game/
 │   ├── App.js              # 主应用组件
 │   ├── App.css             # 主样式
 │   └── index.js            # 入口文件
+├── scripts/                # 构建脚本
+│   ├── fix-relative-paths.js  # 路径修复脚本
+│   └── test-deployment.js     # 测试服务器
+├── build/                  # 构建输出
 ├── package.json            # 项目配置
+├── DEPLOYMENT.md           # 部署指南
 └── README.md              # 说明文档
 ```
+
+## 🚀 部署功能
+
+### 次级目录部署支持
+- ✅ 自动使用相对路径
+- ✅ 支持任意部署目录
+- ✅ 无需修改配置文件
+- ✅ 兼容静态托管服务
+
+详细部署说明请参考 [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## 🛠️ 技术实现
 

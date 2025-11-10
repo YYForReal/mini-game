@@ -2,6 +2,7 @@
   "name": "light-beam-game",
   "version": "1.0.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -10,6 +11,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:relative": "npm run build && npm run fix-relative-paths",
+    "fix-relative-paths": "node scripts/fix-relative-paths.js",
+    "serve": "node scripts/test-deployment.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
