@@ -1,0 +1,292 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.App {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Arial', sans-serif;
+}
+
+/* 移动端虚拟控制器 */
+.mobile-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 20;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.control-pad {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 20px;
+  pointer-events: all;
+}
+
+.control-btn {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(100, 200, 255, 0.5);
+  border-radius: 12px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.control-btn:hover {
+  background: rgba(100, 200, 255, 0.3);
+  border-color: rgba(100, 200, 255, 0.8);
+  transform: scale(1.1);
+}
+
+.control-btn:active {
+  background: rgba(100, 200, 255, 0.5);
+  transform: scale(0.95);
+}
+
+.control-btn.up {
+  top: 0;
+  left: 50px;
+}
+
+.control-btn.down {
+  bottom: 0;
+  left: 50px;
+}
+
+.control-btn.left {
+  top: 50px;
+  left: 0;
+}
+
+.control-btn.right {
+  top: 50px;
+  right: 0;
+}
+
+.middle-row {
+  position: relative;
+  width: 150px;
+  height: 50px;
+  top: 50px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: all;
+}
+
+.action-btn {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(100, 200, 255, 0.5);
+  border-radius: 12px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+.action-btn:hover {
+  background: rgba(100, 200, 255, 0.3);
+  border-color: rgba(100, 200, 255, 0.8);
+  transform: scale(1.05);
+}
+
+.action-btn:active {
+  background: rgba(100, 200, 255, 0.5);
+  transform: scale(0.95);
+}
+
+.action-btn.restart {
+  background: rgba(255, 100, 100, 0.3);
+  border-color: rgba(255, 100, 100, 0.7);
+}
+
+.action-btn.restart:hover {
+  background: rgba(255, 100, 100, 0.5);
+  border-color: rgba(255, 100, 100, 0.9);
+}
+
+.action-btn.boost {
+  background: rgba(255, 200, 0, 0.3);
+  border-color: rgba(255, 200, 0, 0.7);
+  font-size: 18px;
+  padding: 10px;
+}
+
+.action-btn.boost:hover:not(:disabled) {
+  background: rgba(255, 200, 0, 0.5);
+  border-color: rgba(255, 200, 0, 0.9);
+}
+
+.action-btn.boost:disabled {
+  opacity: 0.3;
+  background: rgba(100, 100, 100, 0.3);
+  border-color: rgba(100, 100, 100, 0.5);
+}
+
+.action-btn.shield {
+  background: rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 0.7);
+  font-size: 18px;
+  padding: 10px;
+}
+
+.action-btn.shield:hover:not(:disabled) {
+  background: rgba(0, 255, 255, 0.5);
+  border-color: rgba(0, 255, 255, 0.9);
+}
+
+.action-btn.shield:disabled {
+  opacity: 0.3;
+  background: rgba(100, 100, 100, 0.3);
+  border-color: rgba(100, 100, 100, 0.5);
+}
+
+/* 响应式设计 */
+@media (min-width: 768px) {
+  .mobile-controls {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .control-pad {
+    width: 120px;
+    height: 120px;
+  }
+
+  .control-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .control-btn.up {
+    top: 0;
+    left: 40px;
+  }
+
+  .control-btn.down {
+    bottom: 0;
+    left: 40px;
+  }
+
+  .control-btn.left {
+    top: 40px;
+    left: 0;
+  }
+
+  .control-btn.right {
+    top: 40px;
+    right: 0;
+  }
+
+  .middle-row {
+    width: 120px;
+    height: 40px;
+    top: 40px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .action-btn {
+    font-size: 12px;
+    padding: 10px 16px;
+    min-width: 80px;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .mobile-controls {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .control-pad {
+    width: 100px;
+    height: 100px;
+  }
+
+  .control-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .control-btn.up {
+    left: 34px;
+  }
+
+  .control-btn.down {
+    left: 34px;
+  }
+
+  .control-btn.left {
+    top: 34px;
+  }
+
+  .control-btn.right {
+    top: 34px;
+  }
+
+  .middle-row {
+    width: 100px;
+    height: 32px;
+    top: 34px;
+  }
+}
+
+/* 禁用移动设备的默认行为 */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 滚动锁定 */
+html, body {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
