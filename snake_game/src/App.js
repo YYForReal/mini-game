@@ -142,19 +142,27 @@ function App() {
 
       {/* Game State Overlays */}
       {gameState === 'ready' && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 100
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 100,
+            cursor: 'pointer'
+          }}
+          onClick={() => game.start()}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            game.start();
+          }}
+        >
           <div style={{
             textAlign: 'center',
             color: 'white',
@@ -163,7 +171,8 @@ function App() {
             border: '2px solid rgba(100, 255, 100, 0.5)',
             borderRadius: '20px',
             backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(100, 255, 100, 0.3)'
+            boxShadow: '0 8px 32px rgba(100, 255, 100, 0.3)',
+            pointerEvents: 'none' // 防止子元素触发父元素的点击事件
           }}>
             <h2 style={{
               fontSize: '36px',
@@ -217,7 +226,10 @@ function App() {
 
             <div style={{ marginTop: '25px', padding: '15px', background: 'rgba(100, 255, 100, 0.1)', borderRadius: '10px', border: '1px solid rgba(100, 255, 100, 0.3)' }}>
               <p style={{ fontSize: '16px', margin: '0', color: 'rgba(100, 255, 100, 1)', fontWeight: 'bold' }}>
-                🚀 按任意方向键开始游戏
+                🚀 点击任意位置开始游戏
+              </p>
+              <p style={{ fontSize: '14px', margin: '8px 0 0 0', color: 'rgba(255, 255, 255, 0.7)' }}>
+                或按任意方向键开始
               </p>
             </div>
           </div>
@@ -225,19 +237,27 @@ function App() {
       )}
 
       {gameState === 'paused' && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 100
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 100,
+            cursor: 'pointer'
+          }}
+          onClick={() => game.pause()}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            game.pause();
+          }}
+        >
           <div style={{
             textAlign: 'center',
             color: 'white',
@@ -246,7 +266,8 @@ function App() {
             border: '2px solid rgba(255, 200, 0, 0.5)',
             borderRadius: '20px',
             backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(255, 200, 0, 0.3)'
+            boxShadow: '0 8px 32px rgba(255, 200, 0, 0.3)',
+            pointerEvents: 'none'
           }}>
             <h2 style={{
               fontSize: '32px',
@@ -256,25 +277,36 @@ function App() {
             }}>
               游戏暂停
             </h2>
-            <p style={{ fontSize: '16px', margin: '10px 0' }}>按空格键继续</p>
+            <p style={{ fontSize: '16px', margin: '10px 0' }}>点击任意位置继续</p>
+            <p style={{ fontSize: '14px', margin: '8px 0 0 0', color: 'rgba(255, 255, 255, 0.7)' }}>
+              或按空格键继续
+            </p>
           </div>
         </div>
       )}
 
       {gameState === 'game_over' && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 100
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 100,
+            cursor: 'pointer'
+          }}
+          onClick={() => game.restart()}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            game.restart();
+          }}
+        >
           <div style={{
             textAlign: 'center',
             color: 'white',
@@ -283,7 +315,8 @@ function App() {
             border: '2px solid rgba(255, 100, 100, 0.5)',
             borderRadius: '20px',
             backdropFilter: 'blur(20px)',
-            boxShadow: '0 8px 32px rgba(255, 100, 100, 0.3)'
+            boxShadow: '0 8px 32px rgba(255, 100, 100, 0.3)',
+            pointerEvents: 'none'
           }}>
             <h2 style={{
               fontSize: '32px',
@@ -295,7 +328,10 @@ function App() {
             </h2>
             <p style={{ fontSize: '16px', margin: '10px 0' }}>最终得分: {score}</p>
             <p style={{ fontSize: '16px', margin: '10px 0' }}>达到等级: {level}</p>
-            <p style={{ fontSize: '16px', margin: '10px 0' }}>按R键重新开始</p>
+            <p style={{ fontSize: '16px', margin: '10px 0' }}>点击任意位置重新开始</p>
+            <p style={{ fontSize: '14px', margin: '8px 0 0 0', color: 'rgba(255, 255, 255, 0.7)' }}>
+              或按R键重新开始
+            </p>
           </div>
         </div>
       )}
