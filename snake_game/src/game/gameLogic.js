@@ -490,6 +490,11 @@ export class LightBeamGame {
     // 计算当前速度
     const currentSpeed = this.boostMode ? this.speed * 2 : this.speed;
 
+    // 安全检查：确保beam数组存在且有头部
+    if (!this.beam || this.beam.length === 0 || !this.beam[0]) {
+      return;
+    }
+
     // 移动光束头部
     const head = this.beam[0];
     const moveDistance = currentSpeed;
@@ -500,25 +505,66 @@ export class LightBeamGame {
     head.addTrailPoint(head.x, head.y);
 
     // 检查边界碰撞
-    if (newX < 20 || newX > this.worldWidth - 20 ||
-        newY < 20 || newY > this.worldHeight - 20) {
-      if (this.shieldActive) {
-        // 护盾激活：反弹而不是游戏结束
-        this.shieldActive = false;
-        this.shieldEndTime = 0;
-        // 创建护盾破碎效果
-        this.createShieldBreakEffect(newX, newY);
-        // 反弹角度
-        this.angle = MathUtils.normalizeAngle(this.angle + Math.PI);
-        this.targetAngle = this.angle;
-        return;
-      } else {
-        this.gameOver();
-        return;
+    // 在移动端，左右边界可以穿越
+    const isMobile = PERFORMANCE_CONFIG.isMobile();
+    let finalX = newX;
+    let finalY = newY;
+
+    if (isMobile) {
+      // 移动端：左右边界穿越
+      let teleported = false;
+      if (newX < 20) {
+        finalX = this.worldWidth - 20;
+        teleported = true;
+      } else if (newX > this.worldWidth - 20) {
+        finalX = 20;
+        teleported = true;
+      }
+
+      // 创建穿越特效
+      if (teleported) {
+        this.createTeleportEffect(head.x, head.y, finalX, finalY);
+      }
+
+      // 上下边界仍然导致游戏结束
+      if (newY < 20 || newY > this.worldHeight - 20) {
+        if (this.shieldActive) {
+          // 护盾激活：反弹而不是游戏结束
+          this.shieldActive = false;
+          this.shieldEndTime = 0;
+          // 创建护盾破碎效果
+          this.createShieldBreakEffect(finalX, newY);
+          // 反弹角度
+          this.angle = MathUtils.normalizeAngle(this.angle + Math.PI);
+          this.targetAngle = this.angle;
+          return;
+        } else {
+          this.gameOver();
+          return;
+        }
+      }
+    } else {
+      // 桌面端：所有边界都导致游戏结束
+      if (newX < 20 || newX > this.worldWidth - 20 ||
+          newY < 20 || newY > this.worldHeight - 20) {
+        if (this.shieldActive) {
+          // 护盾激活：反弹而不是游戏结束
+          this.shieldActive = false;
+          this.shieldEndTime = 0;
+          // 创建护盾破碎效果
+          this.createShieldBreakEffect(newX, newY);
+          // 反弹角度
+          this.angle = MathUtils.normalizeAngle(this.angle + Math.PI);
+          this.targetAngle = this.angle;
+          return;
+        } else {
+          this.gameOver();
+          return;
+        }
       }
     }
 
-    const newHead = new LightBeamSegment(newX, newY, 1.0);
+    const newHead = new LightBeamSegment(finalX, finalY, 1.0);
 
     // 检查自身碰撞（基于距离）
     // 添加开始保护期：前500ms内不检测自身碰撞
@@ -709,6 +755,14 @@ export class LightBeamGame {
   createBoostParticles() {
     if (!this.boostMode) return;
 
+    // 安全检查：确保beam数组存在且有头部
+    if (!this.beam || this.beam.length === 0 || !this.beam[0]) return;
+
+    // 安全检查：确保velocity存在
+    if (!this.velocity || typeof this.velocity.x !== 'number' || typeof this.velocity.y !== 'number') {
+      return;
+    }
+
     const head = this.beam[0];
     const x = head.x;
     const y = head.y;
@@ -729,6 +783,9 @@ export class LightBeamGame {
 
   createShieldEffect() {
     if (!this.shieldActive) return;
+
+    // 安全检查：确保beam数组存在
+    if (!this.beam || this.beam.length === 0) return;
 
     this.beam.forEach((segment, index) => {
       if (index % 2 === 0) { // 每隔一段创建一个护盾粒子
@@ -772,6 +829,43 @@ export class LightBeamGame {
       const size = 2 + Math.random() * 2;
 
       this.particles.push(new Particle(x, y, vx, vy, color, size, 'star'));
+    }
+  }
+
+  createTeleportEffect(fromX, fromY, toX, toY) {
+    // 在起点创建消失特效
+    for (let i = 0; i < 15; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const color = 'rgba(150, 100, 255, 0.8)';
+      const size = 2 + Math.random() * 2;
+
+      this.particles.push(new Particle(fromX, fromY, vx, vy, color, size, 'star'));
+    }
+
+    // 在终点创建出现特效
+    for (let i = 0; i < 15; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const color = 'rgba(100, 255, 150, 0.8)';
+      const size = 2 + Math.random() * 2;
+
+      this.particles.push(new Particle(toX, toY, vx, vy, color, size, 'glow'));
+    }
+
+    // 创建一条连接两边的光线轨迹
+    for (let i = 0; i < 8; i++) {
+      const t = i / 7;
+      const x = fromX + (toX - fromX) * t;
+      const y = fromY + (toY - fromY) * t;
+      const color = 'rgba(200, 150, 255, 0.6)';
+      const size = 1.5 + Math.random();
+
+      this.particles.push(new Particle(x, y, 0, 0, color, size, 'glow'));
     }
   }
 
@@ -844,11 +938,13 @@ export class LightBeamGame {
     this.gameState = GAME_STATES.GAME_OVER;
 
     // 创建爆炸效果
-    const head = this.beam[0];
-    this.createExplosionParticles(
-      head.x,
-      head.y
-    );
+    if (this.beam && this.beam.length > 0 && this.beam[0]) {
+      const head = this.beam[0];
+      this.createExplosionParticles(
+        head.x,
+        head.y
+      );
+    }
   }
 
   restart() {

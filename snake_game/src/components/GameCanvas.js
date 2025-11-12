@@ -167,8 +167,8 @@ const GameCanvas = ({ game }) => {
 
     // 绘制加速模式效果
     if (game.boostMode) {
-      const head = game.beam[0];
-      if (head) {
+      const head = game.beam && game.beam.length > 0 ? game.beam[0] : null;
+      if (head && game.velocity && typeof game.velocity.x === 'number' && typeof game.velocity.y === 'number') {
         // 绘制速度线条
         for (let i = 0; i < 8; i++) {
           const angle = Math.atan2(-game.velocity.y, -game.velocity.x) + (Math.random() - 0.5) * 0.4;
