@@ -141,6 +141,13 @@ const GameCanvas = ({ game }) => {
       }
     });
 
+    // 绘制GitHub物品
+    game.githubItems.forEach(item => {
+      if (!item.collected || item.collectAnimation < 1) {
+        item.render(ctx);
+      }
+    });
+
     // 恢复全局透明度
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
@@ -212,7 +219,7 @@ const GameCanvas = ({ game }) => {
 
     // 游戏状态覆盖层
     if (game.gameState === GAME_STATES.READY) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
       ctx.fillRect(0, 0, width, height);
 
       ctx.fillStyle = 'white';
@@ -226,7 +233,7 @@ const GameCanvas = ({ game }) => {
     }
 
     if (game.gameState === GAME_STATES.PAUSED) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
       ctx.fillRect(0, 0, width, height);
 
       ctx.fillStyle = 'white';
@@ -239,10 +246,10 @@ const GameCanvas = ({ game }) => {
     }
 
     if (game.gameState === GAME_STATES.GAME_OVER) {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = 'rgba(255, 100, 100, 0.8)';
+      ctx.fillStyle = 'rgba(255, 100, 100, 0.9)';
       ctx.font = 'bold 36px Arial';
       ctx.textAlign = 'center';
       ctx.fillText('游戏结束', width / 2, height / 2 - 60);

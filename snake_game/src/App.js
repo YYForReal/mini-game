@@ -8,6 +8,7 @@ import './App.css';
 function App() {
   const gameRef = useRef(new LightBeamGame());
   const game = gameRef.current;
+
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [gameState, setGameState] = useState(game.gameState);
@@ -56,7 +57,7 @@ function App() {
         left: '20px',
         color: 'white',
         fontSize: '18px',
-        background: 'rgba(0, 0, 0, 0.7)',
+        background: 'rgba(0, 0, 0, 0.5)',
         padding: '15px 20px',
         borderRadius: '12px',
         border: '2px solid rgba(100, 200, 255, 0.5)',

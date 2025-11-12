@@ -99,6 +99,128 @@ export class LightBeamSegment {
   }
 }
 
+// GitHub物品类
+export class GitHubItem {
+  constructor(x, y) {
+    this.x = x; // 浮点坐标
+    this.y = y; // 浮点坐标
+    this.type = 'github';
+    this.collected = false;
+    this.collectAnimation = 0;
+    this.baseSize = 15;
+    this.pulsePhase = 0;
+    this.rotation = 0;
+    this.glowIntensity = 0;
+    this.glowDirection = 1;
+  }
+
+  update() {
+    this.pulsePhase += 0.08;
+    this.rotation += 0.02;
+
+    // 发光效果动画
+    this.glowIntensity += 0.05 * this.glowDirection;
+    if (this.glowIntensity >= 1) {
+      this.glowIntensity = 1;
+      this.glowDirection = -1;
+    } else if (this.glowIntensity <= 0.3) {
+      this.glowIntensity = 0.3;
+      this.glowDirection = 1;
+    }
+
+    if (this.collected) {
+      this.collectAnimation += 0.15;
+    }
+  }
+
+  getColor() {
+    const intensity = 0.8 + Math.sin(this.pulsePhase) * 0.2;
+    return `rgba(255, 255, 255, ${intensity})`;
+  }
+
+  getSize() {
+    const pulse = Math.sin(this.pulsePhase) * 2;
+    return this.collected ?
+      this.baseSize * (1 + this.collectAnimation) :
+      this.baseSize + pulse;
+  }
+
+  render(ctx) {
+    ctx.save();
+
+    // 发光效果
+    const glowRadius = this.getSize() * 2;
+    const glowGradient = ctx.createRadialGradient(
+      this.x, this.y, 0,
+      this.x, this.y, glowRadius
+    );
+    glowGradient.addColorStop(0, `rgba(100, 200, 255, ${this.glowIntensity * 0.3})`);
+    glowGradient.addColorStop(0.5, `rgba(100, 200, 255, ${this.glowIntensity * 0.1})`);
+    glowGradient.addColorStop(1, 'rgba(100, 200, 255, 0)');
+
+    ctx.fillStyle = glowGradient;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 旋转效果
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+
+    // 绘制GitHub图标背景
+    const bgGradient = ctx.createLinearGradient(-10, -10, 10, 10);
+    bgGradient.addColorStop(0, 'rgba(51, 51, 51, 0.9)');
+    bgGradient.addColorStop(1, 'rgba(34, 34, 34, 0.9)');
+
+    ctx.fillStyle = bgGradient;
+    ctx.strokeStyle = `rgba(100, 200, 255, ${this.glowIntensity})`;
+    ctx.lineWidth = 2;
+
+    // 圆角矩形背景
+    const size = this.getSize();
+    const radius = 4;
+    ctx.beginPath();
+    ctx.moveTo(-size + radius, -size);
+    ctx.lineTo(size - radius, -size);
+    ctx.arc(size - radius, -size, radius, -Math.PI/2, 0);
+    ctx.lineTo(size, size - radius);
+    ctx.arc(size - radius, size - radius, radius, 0, Math.PI/2);
+    ctx.lineTo(-size + radius, size);
+    ctx.arc(-size + radius, size - radius, radius, Math.PI/2, Math.PI);
+    ctx.arc(-size + radius, -size + radius, radius, Math.PI, -Math.PI/2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // 绘制GitHub猫图标（简化版）
+    ctx.fillStyle = this.getColor();
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = 'rgba(100, 200, 255, 0.8)';
+
+    // GitHub猫的头部和耳朵
+    ctx.beginPath();
+    ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 耳朵
+    ctx.beginPath();
+    ctx.moveTo(-size * 0.6, -size * 0.2);
+    ctx.lineTo(-size * 0.4, -size * 0.6);
+    ctx.lineTo(-size * 0.2, -size * 0.3);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(size * 0.6, -size * 0.2);
+    ctx.lineTo(size * 0.4, -size * 0.6);
+    ctx.lineTo(size * 0.2, -size * 0.3);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+}
+
 // 光点类
 export class LightOrb {
   constructor(x, y, type = 'normal') {
@@ -382,6 +504,7 @@ export class LightBeamGame {
     this.gameStartTime = 0; // 游戏开始时间，用于开始时的保护期
 
     this.orbs = [];
+    this.githubItems = [];
     this.particles = [];
     this.backgroundIllumination = 0;
 
@@ -402,6 +525,7 @@ export class LightBeamGame {
     this.powerUps = [];
 
     this.generateOrbs();
+    this.generateGitHubItem();
   }
 
   generateOrbs() {
@@ -427,6 +551,32 @@ export class LightBeamGame {
     }
   }
 
+  generateGitHubItem() {
+    console.log("navigator.userAgent",navigator.userAgent)
+    // 只在PC端生成GitHub物品
+    const isDesktop = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth > 768;
+
+    if (!isDesktop) return;
+
+    // 每隔30秒生成一个GitHub物品，最多同时存在1个
+    if (this.githubItems.length > 0) return;
+
+    let position;
+    let attempts = 0;
+
+    do {
+      position = {
+        x: 50 + Math.random() * (this.worldWidth - 100),
+        y: 50 + Math.random() * (this.worldHeight - 100)
+      };
+      attempts++;
+    } while (this.isPositionOccupied(position.x, position.y, 50) && attempts < 100);
+
+    if (attempts < 100) {
+      this.githubItems.push(new GitHubItem(position.x, position.y));
+    }
+  }
+
   isPositionOccupied(x, y, minDistance = 30) {
     // 检查是否与光束冲突（基于距离）
     for (const segment of this.beam) {
@@ -439,6 +589,13 @@ export class LightBeamGame {
     for (const orb of this.orbs) {
       const dx = orb.x - x;
       const dy = orb.y - y;
+      if (Math.sqrt(dx * dx + dy * dy) < minDistance) return true;
+    }
+
+    // 检查是否与GitHub物品冲突
+    for (const githubItem of this.githubItems) {
+      const dx = githubItem.x - x;
+      const dy = githubItem.y - y;
       if (Math.sqrt(dx * dx + dy * dy) < minDistance) return true;
     }
 
@@ -617,6 +774,35 @@ export class LightBeamGame {
     // 移除已收集的光点
     this.orbs = this.orbs.filter(orb => !orb.collected || orb.collectAnimation < 1);
 
+    // 检查GitHub物品收集（基于距离）
+    for (let i = 0; i < this.githubItems.length; i++) {
+      const githubItem = this.githubItems[i];
+      if (!githubItem.collected && newHead.distanceTo(githubItem) < 25) { // 稍大一点的收集半径
+        githubItem.collected = true;
+
+        // 创建特殊的GitHub收集效果
+        this.createGitHubCollectEffect(githubItem.x, githubItem.y);
+
+        // 暂停游戏
+        this.pause();
+
+        // 延迟跳转到GitHub（让玩家看到收集效果）
+        setTimeout(() => {
+          window.open('https://github.com/YYForReal/mini-game/tree/main/snake_game', '_blank');
+        }, 800);
+
+        break; // 只收集一个
+      }
+    }
+
+    // 移除已收集的GitHub物品
+    this.githubItems = this.githubItems.filter(item => !item.collected || item.collectAnimation < 1);
+
+    // 定期生成GitHub物品（仅在PC端）
+    if (this.frameCount % 1800 === 0) { // 每30秒（60fps * 30）
+      this.generateGitHubItem();
+    }
+
     // 生成新光点
     if (this.orbs.length === 0) {
       this.generateOrbs();
@@ -691,6 +877,7 @@ export class LightBeamGame {
     }
 
     this.orbs.forEach(orb => orb.update());
+    this.githubItems.forEach(item => item.update());
   }
 
   createCollectParticles(x, y, color, type = 'normal') {
@@ -829,6 +1016,66 @@ export class LightBeamGame {
       const size = 2 + Math.random() * 2;
 
       this.particles.push(new Particle(x, y, vx, vy, color, size, 'star'));
+    }
+  }
+
+  createGitHubCollectEffect(x, y) {
+    // 创建GitHub主题的收集效果
+
+    // 黑色和白色粒子（GitHub主题色）
+    for (let i = 0; i < 50; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 4;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const isWhite = Math.random() > 0.5;
+      const color = isWhite ? 'rgba(255, 255, 255, 0.9)' : 'rgba(33, 33, 33, 0.9)';
+      const size = 2 + Math.random() * 3;
+
+      this.particles.push(new Particle(x, y, vx, vy, color, size, 'star'));
+    }
+
+    // 蓝色光环粒子（GitHub的蓝色）
+    for (let i = 0; i < 30; i++) {
+      const angle = (Math.PI * 2 * i) / 30;
+      const speed = 2 + Math.random() * 3;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const color = 'rgba(33, 136, 255, 0.8)';
+      const size = 2 + Math.random() * 2;
+
+      this.particles.push(new Particle(x, y, vx, vy, color, size, 'glow'));
+    }
+
+    // 代码符号粒子
+    for (let i = 0; i < 15; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      const color = 'rgba(100, 200, 255, 0.7)';
+      const size = 1 + Math.random();
+
+      this.particles.push(new Particle(x, y, vx, vy, color, size, 'spark'));
+    }
+
+    // 屏幕震动和闪光
+    this.screenShake = 15;
+
+    // 创建多层扩散圆环效果
+    for (let ring = 0; ring < 3; ring++) {
+      setTimeout(() => {
+        for (let i = 0; i < 20; i++) {
+          const angle = (Math.PI * 2 * i) / 20;
+          const speed = 3 - ring * 0.5;
+          const vx = Math.cos(angle) * speed;
+          const vy = Math.sin(angle) * speed;
+          const color = `rgba(100, 200, 255, ${0.8 - ring * 0.2})`;
+          const size = 2 - ring * 0.5;
+
+          this.particles.push(new Particle(x, y, vx, vy, color, size, 'glow'));
+        }
+      }, ring * 100);
     }
   }
 
