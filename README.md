@@ -11,6 +11,16 @@
 
 ### 1. 🌊 光影之线 (Light Beam)
 
+| PC端 | 移动端 |
+|---------|---------|
+| <img width="1890" height="734" alt="image" src="https://github.com/user-attachments/assets/8624bc1a-1abf-4df2-a32d-0133672c541d" />   | ![d72a1519a94bedd6bd8321ae0fdb075](https://github.com/user-attachments/assets/9e36c471-4fb1-4055-a15b-e5a15a91d346)   |
+
+
+
+
+
+
+
 **位置**: `snake_game/`
 **类型**: 创意贪吃蛇 | 粒子特效 | 技能系统
 
