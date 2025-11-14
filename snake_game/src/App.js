@@ -338,7 +338,7 @@ function App() {
       )}
 
       {/* 移动端虚拟控制器 */}
-      <div className="mobile-controls">
+      {/* <div className="mobile-controls">
         <div className="control-pad">
           <button
             className="control-btn up"
@@ -402,7 +402,7 @@ function App() {
             </button>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
